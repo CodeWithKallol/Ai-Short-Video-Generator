@@ -9,9 +9,12 @@ import CustomLoading from './_components/CustomLoading';
 import { v4 as uuidv4 } from 'uuid';
 import { VideoDataContext } from '@/app/_context/VideoDataContext';
 import { db } from '@/configs/db';
-import { VideoData } from '@/configs/schema';
+import { Users, VideoData } from '@/configs/schema';
 import { useUser } from '@clerk/nextjs';
-
+import PlayerDialog from '../_components/PlayerDialog';
+import { UserDetailContext } from '@/app/_context/UserDetailContext';
+import { eq } from 'drizzle-orm';
+import { toast } from "sonner"
 
 function CreateNew() {
   const [formData, setFormData] = useState({});
@@ -20,6 +23,10 @@ function CreateNew() {
   const [audioFileUrl, setAudioFileUrl] = useState();
   const [captions, setCaptions] = useState();
   const [imageList, setImageList] = useState();
+  const [playVideo, setPlayVideo] = useState(false);
+  const [videoId, setVideoId] = useState();
+  const {userDetail, setUserDetail} = useContext(UserDetailContext);
+
   const {videoData, setVideoData} = useContext(VideoDataContext);
   const {user} = useUser();
 
@@ -33,6 +40,10 @@ function CreateNew() {
   }
 
   const onCreateClickHandler=()=>{
+    if(!userDetail?.credits>0){
+      toast("you don't have enough credits.")
+      return ;
+    }
     GetVideoScript();
   }
 
@@ -48,7 +59,7 @@ function CreateNew() {
       console.log(resp.data.result);
       setVideoData(prev=>({
         ...prev,
-        'videoScript':resp.data.result
+        'videoScript':resp.data.result.video_scenes
       }))
       setVideoScript(resp.data.result.video_scenes);
       GenerateAudioFile(resp.data.result.video_scenes);
@@ -56,7 +67,7 @@ function CreateNew() {
   }catch(error){
     console.log("The Error is: ", error);
   }
-  setLoading(false);
+ 
   }
 
   const GenerateAudioFile = async(videoScriptData)=>{
@@ -88,7 +99,7 @@ function CreateNew() {
 
 
   const GenerateAudioCaption = async(fileUrl, videoScriptData) =>{
-    setLoading(true);
+   
 
     try{
       await axios.post('/api/generate-caption', {
@@ -106,7 +117,7 @@ function CreateNew() {
       console.log(e);
     }
 
-    setLoading(false);
+    
   }
 
 const GenerateImage = async (scriptData) => { // ACCEPT the data as an argument
@@ -147,9 +158,7 @@ const GenerateImage = async (scriptData) => { // ACCEPT the data as an argument
     });
   } catch (error) {
     console.error("Image generation failed:", error);
-  } finally {
-    setLoading(false);
-  }
+  } 
 };
 
   useEffect(()=>{
@@ -160,7 +169,7 @@ const GenerateImage = async (scriptData) => { // ACCEPT the data as an argument
   }, [videoData]);
 
   const SaveVideoData = async(videoData) =>{
-    setLoading(true);
+    
     const result = await db.insert(VideoData).values({
       script: videoData?.videoScript,
       audioFileUrl: videoData?.audioFileUrl,
@@ -169,8 +178,24 @@ const GenerateImage = async (scriptData) => { // ACCEPT the data as an argument
       createdBy: user?.primaryEmailAddress?.emailAddress
     }).returning({id:VideoData?.id})
 
+    await UpdateUserCredits();
+    setVideoId(result[0].id);
+    setPlayVideo(true);
     console.log(result);
     setLoading(false);
+  }
+
+  const UpdateUserCredits = async() =>{
+    const result = await db.update(Users).set({
+      credits: userDetail?.credits-10
+    }).where(eq(Users?.email, user?.primaryEmailAddress?.emailAddress));
+    console.log(result);
+    setUserDetail(prev=>({
+      ...prev,
+      'credits':userDetail?.credits-10
+    }))
+
+   
   }
   return (
     <div className='md:px-20'>
@@ -187,6 +212,8 @@ const GenerateImage = async (scriptData) => { // ACCEPT the data as an argument
         <Button className='mt-10 w-full bg-indigo-700 cursor-pointer font-bold text-xl p-5 hover:bg-green-700' onClick={onCreateClickHandler}>Create Short Video</Button>
       </div>
       <CustomLoading loading={loading}/>
+
+      <PlayerDialog playVideo={playVideo} videoId={videoId}/>
     </div>
   )
 }

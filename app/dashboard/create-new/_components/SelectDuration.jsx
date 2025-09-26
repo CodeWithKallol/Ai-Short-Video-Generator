@@ -21,6 +21,7 @@ function SelectDuration({onUserSelect}) {
             </SelectTrigger>
             <SelectContent>
 
+                <SelectItem value='15 Seconds' key='15 Seconds' className='cursor-pointer'>15 Seconds</SelectItem>
                 <SelectItem value='30 Seconds' key='30 Seconds' className='cursor-pointer'>30 Seconds</SelectItem>
                 <SelectItem value='60 Seconds' key='60 Seconds' className='cursor-pointer'>60 Seconds</SelectItem>
              

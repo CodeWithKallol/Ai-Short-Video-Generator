@@ -2,6 +2,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Provider from "./provider";
 import {Oswald} from "next/font/google"
+import { Toaster } from "@/components/ui/sonner";
 
 
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
           {children}
 
         </Provider>
+        <Toaster/>
       </body>
     </html>
     </ClerkProvider>
