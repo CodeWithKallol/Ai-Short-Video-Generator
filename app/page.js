@@ -76,10 +76,12 @@ export default function Home() {
   return (
     <div>
       <div className="flex gap-10 justify-between items-center p-3 px-5 hover:shadow-2xl">
-        <div className='flex gap-3 items-center cursor-pointer'>
+        <Link href={'/'}>
+        <div className='flex gap-3 items-center cursor-pointer hover:scale-105'>
           <Image src={'/logo.png'} alt='Ai Short Video' width={30} height={30} />
           <h2 className='font-bold text-xl'><span className='text-red-600'>AI</span>Short</h2>
         </div>
+          </Link>
 
         <div className="flex gap-2.5 hover:scale-105 transition-all">
           <Link href={'/dashboard'}>
