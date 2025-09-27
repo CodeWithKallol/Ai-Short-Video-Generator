@@ -18,7 +18,7 @@ function VideoList({ videoList, onDelete }) {
     };
 
     return (
-        <div className='mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 
+        <div className='mt-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 
         gap-10'>
             {videoList?.map((video, index) => (
                 // Use a 'group' class for hover effects on child elements
@@ -43,8 +43,8 @@ function VideoList({ videoList, onDelete }) {
                     >
                         <Thumbnail
                             component={RemotionVideo}
-                            compositionWidth={250}
-                            compositionHeight={390}
+                            compositionWidth={200}
+                            compositionHeight={300}
                             frameToDisplay={30}
                             durationInFrames={120}
                             fps={30}
