@@ -18,10 +18,12 @@ function Header() {
         </div>
       </Link>
       <div className='flex gap-3 items-center'>
+        <Link href={'/upgrade'}>
         <div className='flex gap-1 items-center'>
-          <Image src={'/coin.png'} width={20} height={20} alt='credits' />
+          <Image src={'/coin.gif'} width={35} height={35} alt='credits' />
           <h2>{userDetail?.credits}</h2>
         </div>
+        </Link>
         <Link href={'/dashboard'}>
           <Button className='text-xl bg-indigo-700 cursor-pointer'>Dashboard</Button>
         </Link>
